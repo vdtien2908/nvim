@@ -3,7 +3,6 @@ vim.g.mapleader = " "
 local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
 
-vim.g.mapleader = " "
 
 -- Options -----------------------------------------------
 vim.opt.encoding = "utf-8"
@@ -96,6 +95,7 @@ keymap.set("n", "<leader>q", ":q<CR>", opts)
 keymap.set("n", "<leader>Q", ":qa<CR>", opts)
 keymap.set("n", "<leader>w", ":w<CR>", opts)
 
+-- Change cursor default when nvim
 vim.cmd([[
     augroup RestoreCursorShapeOnExit
         autocmd!
