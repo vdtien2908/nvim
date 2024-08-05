@@ -4,6 +4,7 @@ return {
 	config = function()
 		require("toggleterm").setup({
 			size = 20,
+      auto_scroll= true,
 			open_mapping = [[<c-\>]],
 			hide_numbers = true,
 			shade_filetypes = {},

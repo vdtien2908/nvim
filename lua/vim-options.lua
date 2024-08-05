@@ -3,7 +3,6 @@ vim.g.mapleader = " "
 local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
 
-
 -- Options -----------------------------------------------
 vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
@@ -28,12 +27,12 @@ vim.opt.smarttab = true
 vim.opt.breakindent = true
 vim.opt.shiftwidth = 2
 vim.opt.tabstop = 2
-vim.opt.wrap = false          -- No Wrap lines
+vim.opt.wrap = false -- No Wrap lines
 vim.opt.backspace = { "start", "eol", "indent" }
 vim.opt.path:append({ "**" }) -- Finding files - Search down into subfolders
 vim.opt.wildignore:append({ "*/node_modules/*" })
-vim.opt.splitbelow = true     -- Put new windows below current
-vim.opt.splitright = true     -- Put new windows right of current
+vim.opt.splitbelow = true -- Put new windows below current
+vim.opt.splitright = true -- Put new windows right of current
 vim.opt.splitkeep = "cursor"
 vim.opt.mouse = ""
 
@@ -102,3 +101,12 @@ vim.cmd([[
         autocmd VimLeave * set guicursor=a:ver1
     augroup END
 ]])
+
+-- vim.api.nvim_create_autocmd("VimLeavePre", {
+-- 	callback = function()
+-- 		local terms = require("toggleterm.terminal").get_all()
+-- 		for _, term in ipairs(terms) do
+-- 			term:shutdown()
+-- 		end
+-- 	end,
+-- })

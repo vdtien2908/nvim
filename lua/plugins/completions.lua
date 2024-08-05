@@ -23,6 +23,28 @@ return {
         capabilities = capabilities,
       })
 
+      -- Configure Go language server (gopls)
+      lspconfig.gopls.setup({
+        capabilities = capabilities,
+        settings = {
+          gopls = {
+            analyses = {
+              unusedparams = true,
+            },
+            staticcheck = true,
+          },
+        },
+        handlers = {
+          ["window/showMessage"] = function(_, result, ctx)
+            if result.type == 3 and result.message:match("Gopls was built with Go version") then
+              -- Ignore warning about Go version
+              return
+            end
+            vim.lsp.handlers["window/showMessage"](nil, result, ctx)
+          end,
+        },
+      })
+
       cmp.setup({
         snippet = {
           expand = function(args)
