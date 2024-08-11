@@ -11,6 +11,7 @@ return {
         null_ls.builtins.formatting.rubocop,
         null_ls.builtins.formatting.phpcsfixer,
         null_ls.builtins.formatting.gofmt,
+        null_ls.builtins.formatting.black
       },
     })
 
