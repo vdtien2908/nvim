@@ -1,74 +1,72 @@
 return {
-  {
-    "hrsh7th/cmp-nvim-lsp"
-  },
-  {
-    "L3MON4D3/LuaSnip",
-    dependencies = {
-      "saadparwaiz1/cmp_luasnip",
-      "rafamadriz/friendly-snippets",
-    },
-  },
-  {
-    "hrsh7th/nvim-cmp",
-    config = function()
-      local cmp = require("cmp")
-      local lspconfig = require("lspconfig")
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+	"hrsh7th/nvim-cmp",
+	event = "InsertEnter",
+	dependencies = {
+		"L3MON4D3/LuaSnip",
+		"saadparwaiz1/cmp_luasnip",
+		"hrsh7th/cmp-nvim-lsp",
+		"rafamadriz/friendly-snippets",
+		"hrsh7th/cmp-buffer",
+		"hrsh7th/cmp-path",
+		"hrsh7th/cmp-cmdline",
+	},
+	config = function()
+		local cmp = require("cmp")
+		local luasnip = require("luasnip")
+		require("luasnip.loaders.from_vscode").lazy_load()
+		luasnip.config.setup({})
 
-      require("luasnip.loaders.from_vscode").lazy_load()
-
-      -- Configure PHP language server
-      lspconfig.intelephense.setup({
-        capabilities = capabilities,
-      })
-
-      -- Configure Go language server (gopls)
-      lspconfig.gopls.setup({
-        capabilities = capabilities,
-        settings = {
-          gopls = {
-            analyses = {
-              unusedparams = true,
-            },
-            staticcheck = true,
-          },
-        },
-        handlers = {
-          ["window/showMessage"] = function(_, result, ctx)
-            if result.type == 3 and result.message:match("Gopls was built with Go version") then
-              -- Ignore warning about Go version
-              return
-            end
-            vim.lsp.handlers["window/showMessage"](nil, result, ctx)
-          end,
-        },
-      })
-
-      cmp.setup({
-        snippet = {
-          expand = function(args)
-            require("luasnip").lsp_expand(args.body)
-          end,
-        },
-        window = {
-          completion = cmp.config.window.bordered(),
-          documentation = cmp.config.window.bordered(),
-        },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<C-Space>"] = cmp.mapping.complete(),
-          ["<C-e>"] = cmp.mapping.abort(),
-          ["<CR>"] = cmp.mapping.confirm({ select = true }),
-        }),
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" }, -- For luasnip users.
-        }, {
-          { name = "buffer" },
-        }),
-      })
-    end,
-  },
+		cmp.setup({
+			snippet = {
+				expand = function(args)
+					luasnip.lsp_expand(args.body)
+				end,
+			},
+			completion = {
+				completeopt = "menu,menuone,noinsert",
+			},
+			mapping = cmp.mapping.preset.insert({
+				["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
+				["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
+				["<C-b>"] = cmp.mapping.scroll_docs(-4), -- scroll backward
+				["<C-f>"] = cmp.mapping.scroll_docs(4), -- scroll forward
+				["<C-Space>"] = cmp.mapping.complete({}), -- show completion suggestions
+				["<CR>"] = cmp.mapping.confirm({
+					behavior = cmp.ConfirmBehavior.Replace,
+					select = true,
+				}),
+				-- Tab through suggestions or when a snippet is active, tab to the next argument
+				["<Tab>"] = cmp.mapping(function(fallback)
+					if cmp.visible() then
+						cmp.select_next_item()
+					elseif luasnip.expand_or_locally_jumpable() then
+						luasnip.expand_or_jump()
+					else
+						fallback()
+					end
+				end, { "i", "s" }),
+				-- Tab backwards through suggestions or when a snippet is active, tab to the next argument
+				["<S-Tab>"] = cmp.mapping(function(fallback)
+					if cmp.visible() then
+						cmp.select_prev_item()
+					elseif luasnip.locally_jumpable(-1) then
+						luasnip.jump(-1)
+					else
+						fallback()
+					end
+				end, { "i", "s" }),
+			}),
+			sources = cmp.config.sources({
+				{ name = "nvim_lsp" }, -- lsp
+				{ name = "luasnip" }, -- snippets
+				{ name = "buffer" }, -- text within current buffer
+				{ name = "path" }, -- file system paths
+			}),
+			window = {
+				-- Add borders to completions popups
+				completion = cmp.config.window.bordered(),
+				documentation = cmp.config.window.bordered(),
+			},
+		})
+	end,
 }
